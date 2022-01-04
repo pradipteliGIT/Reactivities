@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Grid } from "@mui/material";
 import React from "react";
 import Activity from "../../../app/models/activity";
 import ActivityList from "../ActivityList/ActivityList";
@@ -15,12 +15,14 @@ interface Props {
   handleCancelEditMode: () => void;
   createOrEdit: (activity: Activity) => void;
   handleDelete: (id: string) => void;
+  submitting: boolean;
 }
 
 const ActivityDashboard = ({
   activities,
   selectedActivity,
   editMode,
+  submitting,
   handleSelectedActivity,
   handleCancelActivity,
   handleEditMode,
@@ -36,6 +38,7 @@ const ActivityDashboard = ({
             activities={activities}
             handleSelectedActivity={handleSelectedActivity}
             handleDelete={handleDelete}
+            submitting={submitting}
           />
         </Grid>
         <Grid item xs={4}>
@@ -51,6 +54,7 @@ const ActivityDashboard = ({
               activity={selectedActivity}
               handleCancelEditMode={handleCancelEditMode}
               createOrEdit={createOrEdit}
+              submitting={submitting}
             />
           )}
         </Grid>

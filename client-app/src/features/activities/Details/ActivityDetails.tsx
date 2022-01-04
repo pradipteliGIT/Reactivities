@@ -5,28 +5,23 @@ import {
   CardContent,
   CardHeader,
   CardMedia,
-  createStyles,
-  makeStyles,
-  Theme,
   Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import React from "react";
 import Activity from "../../../app/models/activity";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    media: {
-      height: 0,
-      paddingTop: "56.25%", // 16:9
-    },
-    card: {
-      width: "90%",
-    },
-    cardActions: {
-      display: "flex",
-    },
-  })
-);
+const useStyles = {
+  media: {
+    height: 0,
+    paddingTop: "56.25%", // 16:9
+  },
+  card: {
+    width: "90%",
+  },
+  cardActions: {
+    display: "flex",
+  },
+};
 
 interface Props {
   activity: Activity;
@@ -39,13 +34,13 @@ const ActivityDetails = ({
   handleCancelActivity,
   handleEditMode,
 }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles;
   return (
     <>
-      <Card className={classes.card}>
+      <Card sx={classes.card}>
         <CardHeader title={activity.title} subheader={activity.date} />
         <CardMedia
-          className={classes.media}
+          sx={classes.media}
           image={`/asset/categoryImages/${activity.category}.jpg`}
           title="Image"
         />
@@ -57,7 +52,7 @@ const ActivityDetails = ({
             {activity.city},{activity.venue}
           </Typography>
         </CardContent>
-        <CardActions className={classes.cardActions} disableSpacing>
+        <CardActions sx={classes.cardActions} disableSpacing>
           <Button
             onClick={() => {
               handleEditMode(activity.id);

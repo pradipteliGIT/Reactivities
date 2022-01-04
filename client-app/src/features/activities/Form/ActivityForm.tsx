@@ -1,41 +1,36 @@
-import {
-  Button,
-  Card,
-  createStyles,
-  Grid,
-  makeStyles,
-  TextField,
-  Theme,
-} from "@material-ui/core";
+import { DatePicker, LoadingButton } from "@mui/lab";
+import { Button, Card, Grid, TextField } from "@mui/material";
 import React, { ChangeEvent, useState } from "react";
 import Activity from "../../../app/models/activity";
+import { isValid } from "date-fns";
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    card: {
-      marginTop: "5px",
-      width: "90%",
-      padding: "10px",
-    },
-    cardActions: {
-      display: "flex",
-    },
-    textField: {
-      marginBottom: "15px",
-    },
-  })
-);
+const useStyles = {
+  card: {
+    marginTop: "5px",
+    width: "90%",
+    padding: "10px",
+  },
+  cardActions: {
+    display: "flex",
+  },
+  textField: {
+    marginBottom: "15px",
+  },
+};
+
 interface Props {
   activity: Activity | undefined;
   handleCancelEditMode: () => void;
   createOrEdit: (activity: Activity) => void;
+  submitting: boolean;
 }
 const ActivityForm = ({
   activity: SelectedActivity,
+  submitting,
   handleCancelEditMode,
   createOrEdit,
 }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles;
   const initialState = SelectedActivity ?? {
     id: "",
     title: "",
@@ -53,14 +48,23 @@ const ActivityForm = ({
     setActivity({ ...activity, [name]: value });
   };
 
+  const handleDateChange = (currentDate: Date | null) => {
+    let newDate = "";
+    if (currentDate && isValid(currentDate)) {
+      newDate = currentDate.toISOString();
+    }
+    setActivity({ ...activity, date: newDate });
+  };
+
   const handleSubmit = (event: any) => {
     event.preventDefault();
     createOrEdit(activity);
+    console.log(activity);
   };
 
   return (
     <Grid container>
-      <Card className={classes.card}>
+      <Card sx={classes.card}>
         <form onSubmit={handleSubmit} autoComplete="off">
           <TextField
             id="title"
@@ -70,7 +74,7 @@ const ActivityForm = ({
             fullWidth
             value={activity.title}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
           />
           <TextField
             id="description"
@@ -82,7 +86,7 @@ const ActivityForm = ({
             rows={3}
             value={activity.description}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
           />
           <TextField
             id="category"
@@ -92,17 +96,37 @@ const ActivityForm = ({
             fullWidth
             value={activity.category}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
           />
-          <TextField
+          {/* <TextField
             id="date"
             name="date"
             label="Date"
             variant="outlined"
+            type="date"
             fullWidth
+            InputLabelProps={{ shrink: false }}
             value={activity.date}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
+          /> */}
+          <DatePicker
+            label="Basic example"
+            //views={["day", "month", "year"]}
+            inputFormat="dd/MM/yyyy"
+            value={activity.date}
+            onChange={(newValue: Date | null) => {
+              handleDateChange(newValue);
+            }}
+            renderInput={(params) => (
+              <TextField
+                fullWidth
+                name="date"
+                {...params}
+                sx={classes.textField}
+                error={false}
+              />
+            )}
           />
           <TextField
             id="city"
@@ -112,7 +136,7 @@ const ActivityForm = ({
             fullWidth
             value={activity.city}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
           />
           <TextField
             id="venue"
@@ -122,11 +146,19 @@ const ActivityForm = ({
             fullWidth
             value={activity.venue}
             onChange={handleChange}
-            className={classes.textField}
+            sx={classes.textField}
           />
-          <Button variant="contained" type="submit" color="primary">
+          {/* <Button variant="contained" type="submit" color="primary">
             Save
-          </Button>
+          </Button> */}
+          <LoadingButton
+            loading={submitting}
+            variant="contained"
+            type="submit"
+            color="primary"
+          >
+            Save
+          </LoadingButton>
           &nbsp;
           <Button
             onClick={handleCancelEditMode}

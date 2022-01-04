@@ -4,51 +4,60 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  createStyles,
   Grid,
   Link,
-  makeStyles,
-  Theme,
   Typography,
-} from "@material-ui/core";
-import React from "react";
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import React, { SyntheticEvent, useState } from "react";
 import Activity from "../../../app/models/activity";
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    title: {
-      fontSize: 16,
-      marginLeft: 5,
-      color: "black",
-      fontWeight: "bold",
-    },
-    card: {
-      minWidth: "90%",
-    },
-    cardFooter: {
-      display: "flex",
-      justifyContent: "flex-end",
-    },
-    cardHeader: {
-      paddingBottom: 0,
-    },
-    gridContainer: {
-      margin: "20px",
-    },
-  })
-);
+
+const useStyles = {
+  title: {
+    fontSize: 20,
+    marginLeft: 0,
+    color: "black",
+    fontWeight: "bold",
+    textDecoration: "none",
+  },
+  card: {
+    minWidth: "90%",
+  },
+  cardFooter: {
+    display: "flex",
+    justifyContent: "flex-end",
+  },
+  cardHeader: {
+    paddingBottom: 0,
+  },
+  gridContainer: {
+    margin: "20px",
+  },
+};
 
 interface Props {
   activities: Activity[];
+  submitting: boolean;
   handleSelectedActivity: (id: string) => void;
   handleDelete: (id: string) => void;
 }
 
 const ActivityList = ({
   activities,
+  submitting,
   handleSelectedActivity,
   handleDelete,
 }: Props) => {
-  const classes = useStyles();
+  const classes = useStyles;
+  const [target, setTarget] = useState<string | null>(null);
+  const handleActivityDelete = (
+    e: SyntheticEvent<HTMLButtonElement>,
+    id: string
+  ) => {
+    const targetName = e.currentTarget.name;
+    setTarget(targetName);
+    handleDelete(id);
+  };
   return (
     <>
       {activities.map((activity) => (
@@ -60,23 +69,17 @@ const ActivityList = ({
               justifyContent: "center",
             }}
           >
-            <Card className={classes.card} variant="outlined">
+            <Card sx={classes.card} variant="outlined">
               <CardHeader
-                className={classes.cardHeader}
+                sx={classes.cardHeader}
                 title={
                   <>
-                    <Link
-                      className={classes.title}
-                      component="button"
-                      variant="body2"
-                    >
+                    <Link sx={classes.title} component="button" variant="body2">
                       {activity.title}
                     </Link>
-                    <Typography variant="body2" color="textSecondary">
-                      {activity.date}
-                    </Typography>
                   </>
                 }
+                subheader={activity.date}
               ></CardHeader>
               <CardContent>
                 <Typography variant="body2" component="p">
@@ -90,17 +93,19 @@ const ActivityList = ({
                   {activity.category}
                 </Button>
               </CardContent>
-              <CardActions className={classes.cardFooter}>
-                <Button
+              <CardActions sx={classes.cardFooter}>
+                <LoadingButton
+                  name={activity.id}
+                  loading={submitting && activity.id === target}
                   variant="contained"
                   color="secondary"
                   size="small"
-                  onClick={() => {
-                    handleDelete(activity.id);
+                  onClick={(e: SyntheticEvent<HTMLButtonElement>) => {
+                    handleActivityDelete(e, activity.id);
                   }}
                 >
                   Delete
-                </Button>
+                </LoadingButton>
                 <Button
                   variant="contained"
                   color="primary"
