@@ -10,7 +10,8 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import React, { SyntheticEvent, useState } from "react";
-import Activity from "../../../app/models/activity";
+import { useStore } from "../../../stores/store";
+import { observer } from "mobx-react-lite";
 
 const useStyles = {
   title: {
@@ -35,20 +36,10 @@ const useStyles = {
   },
 };
 
-interface Props {
-  activities: Activity[];
-  submitting: boolean;
-  handleSelectedActivity: (id: string) => void;
-  handleDelete: (id: string) => void;
-}
-
-const ActivityList = ({
-  activities,
-  submitting,
-  handleSelectedActivity,
-  handleDelete,
-}: Props) => {
+const ActivityList = () => {
   const classes = useStyles;
+  const { activityStore } = useStore();
+  const { deleteActivity, loading, activityByDate } = activityStore;
   const [target, setTarget] = useState<string | null>(null);
   const handleActivityDelete = (
     e: SyntheticEvent<HTMLButtonElement>,
@@ -56,11 +47,11 @@ const ActivityList = ({
   ) => {
     const targetName = e.currentTarget.name;
     setTarget(targetName);
-    handleDelete(id);
+    deleteActivity(id);
   };
   return (
     <>
-      {activities.map((activity) => (
+      {activityByDate.map((activity) => (
         <Grid key={activity.id} item xs={12}>
           <div
             style={{
@@ -96,7 +87,7 @@ const ActivityList = ({
               <CardActions sx={classes.cardFooter}>
                 <LoadingButton
                   name={activity.id}
-                  loading={submitting && activity.id === target}
+                  loading={loading && activity.id === target}
                   variant="contained"
                   color="secondary"
                   size="small"
@@ -111,7 +102,7 @@ const ActivityList = ({
                   color="primary"
                   size="small"
                   onClick={() => {
-                    handleSelectedActivity(activity.id);
+                    activityStore.setActivity(activity.id);
                   }}
                 >
                   View
@@ -125,4 +116,4 @@ const ActivityList = ({
   );
 };
 
-export default ActivityList;
+export default observer(ActivityList);

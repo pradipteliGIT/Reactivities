@@ -1,8 +1,9 @@
 import { DatePicker, LoadingButton } from "@mui/lab";
 import { Button, Card, Grid, TextField } from "@mui/material";
 import React, { ChangeEvent, useState } from "react";
-import Activity from "../../../app/models/activity";
 import { isValid } from "date-fns";
+import { useStore } from "../../../stores/store";
+import { observer } from "mobx-react-lite";
 
 const useStyles = {
   card: {
@@ -18,20 +19,18 @@ const useStyles = {
   },
 };
 
-interface Props {
-  activity: Activity | undefined;
-  handleCancelEditMode: () => void;
-  createOrEdit: (activity: Activity) => void;
-  submitting: boolean;
-}
-const ActivityForm = ({
-  activity: SelectedActivity,
-  submitting,
-  handleCancelEditMode,
-  createOrEdit,
-}: Props) => {
+const ActivityForm = () => {
   const classes = useStyles;
-  const initialState = SelectedActivity ?? {
+  const { activityStore } = useStore();
+  const {
+    selectedActivity,
+    createActivity,
+    updateActivity,
+    closeForm,
+    loading,
+  } = activityStore;
+
+  const initialState = selectedActivity ?? {
     id: "",
     title: "",
     description: "",
@@ -51,15 +50,14 @@ const ActivityForm = ({
   const handleDateChange = (currentDate: Date | null) => {
     let newDate = "";
     if (currentDate && isValid(currentDate)) {
-      newDate = currentDate.toISOString();
+      newDate = currentDate?.toISOString();
     }
     setActivity({ ...activity, date: newDate });
   };
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    createOrEdit(activity);
-    console.log(activity);
+    !activity.id ? createActivity(activity) : updateActivity(activity);
   };
 
   return (
@@ -98,21 +96,8 @@ const ActivityForm = ({
             onChange={handleChange}
             sx={classes.textField}
           />
-          {/* <TextField
-            id="date"
-            name="date"
-            label="Date"
-            variant="outlined"
-            type="date"
-            fullWidth
-            InputLabelProps={{ shrink: false }}
-            value={activity.date}
-            onChange={handleChange}
-            sx={classes.textField}
-          /> */}
           <DatePicker
             label="Basic example"
-            //views={["day", "month", "year"]}
             inputFormat="dd/MM/yyyy"
             value={activity.date}
             onChange={(newValue: Date | null) => {
@@ -148,11 +133,8 @@ const ActivityForm = ({
             onChange={handleChange}
             sx={classes.textField}
           />
-          {/* <Button variant="contained" type="submit" color="primary">
-            Save
-          </Button> */}
           <LoadingButton
-            loading={submitting}
+            loading={loading}
             variant="contained"
             type="submit"
             color="primary"
@@ -160,11 +142,7 @@ const ActivityForm = ({
             Save
           </LoadingButton>
           &nbsp;
-          <Button
-            onClick={handleCancelEditMode}
-            variant="contained"
-            color="secondary"
-          >
+          <Button onClick={closeForm} variant="contained" color="secondary">
             Cancel
           </Button>
         </form>
@@ -173,4 +151,4 @@ const ActivityForm = ({
   );
 };
 
-export default ActivityForm;
+export default observer(ActivityForm);

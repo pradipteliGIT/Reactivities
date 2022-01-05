@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import Activity from "../../../app/models/activity";
+import { useStore } from "../../../stores/store";
 
 const useStyles = {
   media: {
@@ -23,18 +23,15 @@ const useStyles = {
   },
 };
 
-interface Props {
-  activity: Activity;
-  handleCancelActivity: () => void;
-  handleEditMode: (id?: string) => void;
-}
-
-const ActivityDetails = ({
-  activity,
-  handleCancelActivity,
-  handleEditMode,
-}: Props) => {
+const ActivityDetails = () => {
   const classes = useStyles;
+  const { activityStore } = useStore();
+  const { selectedActivity: activity } = activityStore;
+
+  if (!activity) {
+    return null;
+  }
+
   return (
     <>
       <Card sx={classes.card}>
@@ -55,7 +52,7 @@ const ActivityDetails = ({
         <CardActions sx={classes.cardActions} disableSpacing>
           <Button
             onClick={() => {
-              handleEditMode(activity.id);
+              activityStore.openForm(activity.id);
             }}
             fullWidth
             variant="contained"
@@ -65,7 +62,7 @@ const ActivityDetails = ({
           </Button>
           &nbsp;
           <Button
-            onClick={handleCancelActivity}
+            onClick={activityStore.cancelSelectedActivity}
             fullWidth
             variant="contained"
             color="secondary"

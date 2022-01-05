@@ -1,5 +1,6 @@
 import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import React from "react";
+import { useStore } from "../../../stores/store";
 import "./Navbar.css";
 
 const useStyles = {
@@ -30,12 +31,9 @@ const useStyles = {
   },
 };
 
-interface Props {
-  handleEditMode: (id?: string) => void;
-}
-
-const Navbar = ({ handleEditMode }: Props) => {
+const Navbar = () => {
   const classes = useStyles;
+  const { activityStore } = useStore();
   return (
     <div>
       <AppBar position="static" sx={classes.appBar}>
@@ -48,7 +46,7 @@ const Navbar = ({ handleEditMode }: Props) => {
             Activities
           </Typography>
           <Button
-            onClick={() => handleEditMode()}
+            onClick={() => activityStore.openForm()}
             variant="contained"
             sx={classes.button}
           >

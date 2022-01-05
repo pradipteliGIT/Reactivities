@@ -7,7 +7,7 @@ interface Props {
   label?: string;
 }
 
-const Loading = ({ invisible = false, label = "Loading data" }: Props) => {
+const Loading = ({ invisible = true, label = "Loading data" }: Props) => {
   return (
     <Backdrop
       invisible={invisible}
