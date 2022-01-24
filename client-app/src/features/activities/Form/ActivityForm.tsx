@@ -1,9 +1,12 @@
 import { DatePicker, LoadingButton } from "@mui/lab";
 import { Button, Card, Grid, TextField } from "@mui/material";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { isValid } from "date-fns";
 import { useStore } from "../../../stores/store";
 import { observer } from "mobx-react-lite";
+import { useNavigate, useParams } from "react-router-dom";
+import Loading from "../../../shared/Loading/Loading";
+import { v4 as uuid } from "uuid";
 
 const useStyles = {
   card: {
@@ -19,28 +22,41 @@ const useStyles = {
   },
 };
 
+const initialActivity = {
+  id: "",
+  title: "",
+  description: "",
+  date: "",
+  category: "",
+  city: "",
+  venue: "",
+};
+
 const ActivityForm = () => {
   const classes = useStyles;
+  const navigate = useNavigate();
   const { activityStore } = useStore();
   const {
-    selectedActivity,
     createActivity,
     updateActivity,
-    closeForm,
+    loadActivity,
     loading,
+    loadingInitial,
   } = activityStore;
+  const { id } = useParams<{ id: string }>();
 
-  const initialState = selectedActivity ?? {
-    id: "",
-    title: "",
-    description: "",
-    date: "",
-    category: "",
-    city: "",
-    venue: "",
-  };
+  const [activity, setActivity] = useState({
+    ...initialActivity,
+  });
 
-  const [activity, setActivity] = useState(initialState);
+  useEffect(() => {
+    if (id) loadActivity(id).then((activity) => setActivity(activity!));
+    else {
+      setActivity({
+        ...initialActivity,
+      });
+    }
+  }, [id, loadActivity]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -57,8 +73,22 @@ const ActivityForm = () => {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    !activity.id ? createActivity(activity) : updateActivity(activity);
+    if (activity.id.length === 0) {
+      const payload = {
+        ...activity,
+        id: uuid(),
+      };
+      createActivity(payload).then(() => {
+        navigate(`/activities/${payload.id}`);
+      });
+    } else {
+      updateActivity(activity).then(() => {
+        navigate(`/activities/${activity.id}`);
+      });
+    }
   };
+
+  if (loadingInitial) return <Loading />;
 
   return (
     <Grid container>
@@ -97,6 +127,7 @@ const ActivityForm = () => {
             sx={classes.textField}
           />
           <DatePicker
+            key={id}
             label="Basic example"
             inputFormat="dd/MM/yyyy"
             value={activity.date}
@@ -142,7 +173,7 @@ const ActivityForm = () => {
             Save
           </LoadingButton>
           &nbsp;
-          <Button onClick={closeForm} variant="contained" color="secondary">
+          <Button variant="contained" color="secondary">
             Cancel
           </Button>
         </form>

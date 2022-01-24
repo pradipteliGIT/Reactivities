@@ -1,26 +1,30 @@
 import { Grid } from "@mui/material";
 import { observer } from "mobx-react-lite";
-import React from "react";
+import React, { useEffect } from "react";
+import Loading from "../../../shared/Loading/Loading";
 import { useStore } from "../../../stores/store";
 import ActivityList from "../ActivityList/ActivityList";
-import ActivityDetails from "../Details/ActivityDetails";
-import ActivityForm from "../Form/ActivityForm";
 
 const ActivityDashboard = () => {
   const { activityStore } = useStore();
-  const { selectedActivity, editMode } = activityStore;
+
+  useEffect(() => {
+    activityStore.loadActivities();
+  }, [activityStore]);
+
+  if (activityStore.loadingInitial) {
+    return <Loading label="Loading..." />;
+  }
+
   return (
-    <div style={{ paddingTop: "10px" }}>
-      <Grid container>
-        <Grid item xs={8}>
-          <ActivityList />
-        </Grid>
-        <Grid item xs={4}>
-          {selectedActivity && !editMode && <ActivityDetails />}
-          {editMode && <ActivityForm />}
-        </Grid>
+    <Grid container>
+      <Grid item xs={8}>
+        <ActivityList />
       </Grid>
-    </div>
+      <Grid item xs={4}>
+        <h2>Activity Filters</h2>
+      </Grid>
+    </Grid>
   );
 };
 

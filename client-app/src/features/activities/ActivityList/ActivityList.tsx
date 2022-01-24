@@ -12,6 +12,7 @@ import { LoadingButton } from "@mui/lab";
 import React, { SyntheticEvent, useState } from "react";
 import { useStore } from "../../../stores/store";
 import { observer } from "mobx-react-lite";
+import { NavLink } from "react-router-dom";
 
 const useStyles = {
   title: {
@@ -97,16 +98,11 @@ const ActivityList = () => {
                 >
                   Delete
                 </LoadingButton>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={() => {
-                    activityStore.setActivity(activity.id);
-                  }}
-                >
-                  View
-                </Button>
+                <NavLink to={`/activities/${activity.id}`}>
+                  <Button variant="contained" color="primary" size="small">
+                    View
+                  </Button>
+                </NavLink>
               </CardActions>
             </Card>
           </div>

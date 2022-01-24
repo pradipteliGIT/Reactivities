@@ -1,6 +1,6 @@
 import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import React from "react";
-import { useStore } from "../../../stores/store";
+import { NavLink } from "react-router-dom";
 import "./Navbar.css";
 
 const useStyles = {
@@ -33,25 +33,41 @@ const useStyles = {
 
 const Navbar = () => {
   const classes = useStyles;
-  const { activityStore } = useStore();
+
   return (
     <div>
       <AppBar position="static" sx={classes.appBar}>
         <Toolbar>
-          <img src="./asset/logo.png" alt="logo" className="appbar-logo" />
+          <NavLink
+            to="/"
+            style={({ isActive }) => {
+              return {
+                color: isActive ? "red" : "",
+              };
+            }}
+          >
+            <img src="./asset/logo.png" alt="logo" className="appbar-logo" />
+          </NavLink>
           <Typography variant="h6" sx={classes.title}>
             Reactivities
           </Typography>
-          <Typography variant="h6" sx={classes.titleActivities}>
-            Activities
-          </Typography>
-          <Button
-            onClick={() => activityStore.openForm()}
-            variant="contained"
-            sx={classes.button}
+          <NavLink
+            to="/Dashboard"
+            style={({ isActive }) => {
+              return {
+                color: isActive ? "red" : "",
+              };
+            }}
           >
-            Create Activity
-          </Button>
+            <Typography variant="h6" sx={classes.titleActivities}>
+              Activities
+            </Typography>
+          </NavLink>
+          <NavLink to="/CreateActivity">
+            <Button variant="contained" sx={classes.button}>
+              Create Activity
+            </Button>
+          </NavLink>
         </Toolbar>
       </AppBar>
     </div>

@@ -7,16 +7,20 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
+import { NavLink, useParams } from "react-router-dom";
+import Loading from "../../../shared/Loading/Loading";
 import { useStore } from "../../../stores/store";
+import { observer } from "mobx-react-lite";
 
 const useStyles = {
   media: {
-    height: 0,
+    height: "50px",
     paddingTop: "56.25%", // 16:9
   },
   card: {
-    width: "90%",
+    width: "50%",
+    margin: "auto",
   },
   cardActions: {
     display: "flex",
@@ -26,53 +30,48 @@ const useStyles = {
 const ActivityDetails = () => {
   const classes = useStyles;
   const { activityStore } = useStore();
-  const { selectedActivity: activity } = activityStore;
+  const { selectedActivity: activity, loadActivity } = activityStore;
+  const { id } = useParams<{ id: string }>();
 
-  if (!activity) {
-    return null;
-  }
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (id) {
+      loadActivity(id);
+    }
+  }, [id, loadActivity]);
 
+  if (!activity) return <Loading />;
   return (
-    <>
-      <Card sx={classes.card}>
-        <CardHeader title={activity.title} subheader={activity.date} />
-        <CardMedia
-          sx={classes.media}
-          image={`/asset/categoryImages/${activity.category}.jpg`}
-          title="Image"
-        />
-        <CardContent>
-          <Typography variant="body2" component="p">
-            {activity.description}
-          </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
-            {activity.city},{activity.venue}
-          </Typography>
-        </CardContent>
-        <CardActions sx={classes.cardActions} disableSpacing>
-          <Button
-            onClick={() => {
-              activityStore.openForm(activity.id);
-            }}
-            fullWidth
-            variant="contained"
-            color="primary"
-          >
+    <Card sx={classes.card}>
+      <CardHeader title={activity.title} subheader={activity.date} />
+      <CardMedia
+        sx={classes.media}
+        image={`/asset/categoryImages/${activity.category}.jpg`}
+        title="Image"
+      />
+      <CardContent>
+        <Typography variant="body2" component="p">
+          {activity.description}
+        </Typography>
+        <Typography variant="body2" color="textSecondary" component="p">
+          {activity.city},{activity.venue}
+        </Typography>
+      </CardContent>
+      <CardActions sx={classes.cardActions} disableSpacing>
+        <NavLink to={`/manage/${activity.id}`}>
+          <Button fullWidth variant="contained" color="primary">
             Edit
           </Button>
-          &nbsp;
-          <Button
-            onClick={activityStore.cancelSelectedActivity}
-            fullWidth
-            variant="contained"
-            color="secondary"
-          >
+        </NavLink>
+        &nbsp;
+        <NavLink to="/activities">
+          <Button fullWidth variant="contained" color="secondary">
             Cancel
           </Button>
-        </CardActions>
-      </Card>
-    </>
+        </NavLink>
+      </CardActions>
+    </Card>
   );
 };
 
-export default ActivityDetails;
+export default observer(ActivityDetails);
