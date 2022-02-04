@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Loading from "../../../shared/Loading/Loading";
 import { useStore } from "../../../stores/store";
 import ActivityList from "../ActivityList/ActivityList";
+import ActivityFilters from "./ActivityFilters";
 
 const ActivityDashboard = () => {
   const { activityStore } = useStore();
@@ -22,7 +23,7 @@ const ActivityDashboard = () => {
         <ActivityList />
       </Grid>
       <Grid item xs={4}>
-        <h2>Activity Filters</h2>
+        <ActivityFilters />
       </Grid>
     </Grid>
   );
